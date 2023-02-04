@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -40,24 +41,52 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		def.gravityScale = 1; // Масштабирование гравитации, можно поставить и отрицательное значение, тело полетит вверх
 		def.type = BodyDef.BodyType.StaticBody; // тип тела, статическое, динамическое или кинематическое
-		def.position.set(0,0); // позиция тела
+		def.position.set(300,150); // позиция тела
 
 		//CircleShape // Круг
 		PolygonShape shape = new PolygonShape(); //Прямоугольник
-		shape.setAsBox(10, 500);// размеры прямоугольника от цента в обе стороны, то есть 20х20
+		shape.setAsBox(250, 10);// размеры прямоугольника от цента в обе стороны, то есть 20х20
 		//shape.setRadius(10);
 		fDef.shape = shape;
 		fDef.density = 1; // плотность
 		fDef.friction = 0; //скольжение
 		fDef.restitution = 0; // Прыгучесть
 
-		physicsX.world.createBody(def).createFixture(fDef).setUserData("sphere");
+		physicsX.world.createBody(def).createFixture(fDef).setUserData("rectangle");
+
+
+
+		def.type = BodyDef.BodyType.DynamicBody; // тип тела, статическое, динамическое или кинематическое
+		def.gravityScale = 4; // Масштабирование гравитации, можно поставить и отрицательное значение, тело полетит вверх
+		for (int i = 1; i < 10; i++) {
+			def.position.set(MathUtils.random(100,500),MathUtils.random(300,500)); // позиция тела
+			CircleShape shape1 = new CircleShape(); // Круг
+			shape1.setRadius(10);// диаметр круга, бля, есть только через радиус
+			fDef.shape = shape1; // впихнул
+			fDef.density = 1; // плотность
+			fDef.friction = 0; //скольжение
+			fDef.restitution = 1; // Прыгучесть
+
+			physicsX.world.createBody(def).createFixture(fDef).setUserData("sphere");
+		}
+
+		//Привязываем к картинке
+		def.position.set(MathUtils.random(100,500),MathUtils.random(300,500)); // позиция тела
+		CircleShape shape1 = new CircleShape(); // Круг
+		shape1.setRadius(10);// диаметр круга, бля, есть только через радиус
+		fDef.shape = shape1; // впихнул
+		fDef.density = 1; // плотность
+		fDef.friction = 0; //скольжение
+		fDef.restitution = 1; // Прыгучесть
+
+		body = physicsX.world.createBody(def);
+		body.createFixture(fDef).setUserData("sphere");
 
 
 		shape.dispose();
-		//shapeRenderer = new ShapeRenderer();
+		shapeRenderer = new ShapeRenderer();
 		rectangle = new Rectangle();
-		//circle = new Circle();
+		circle = new Circle();
 		window = new Rectangle(0,0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		myInputProcessor = new MyInputProcessor();
 		Gdx.input.setInputProcessor(myInputProcessor);
@@ -74,10 +103,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-		camera.position.x = Gdx.graphics.getWidth()/2;
-		camera.position.y = Gdx.graphics.getHeight()/2;
-		camera.zoom = 1;
-		camera.update();
+
 
 	}
 
@@ -85,6 +111,11 @@ public class MyGdxGame extends ApplicationAdapter {
 	public void render () {
 		ScreenUtils.clear(1, 1, 1, 0);
 
+
+		camera.position.x = body.getPosition().x;
+		camera.position.y = body.getPosition().y;
+		camera.zoom = 1;
+		camera.update();
 //		float x = Gdx.input.getX()- coinImg.getWidth()/2; //привязка к мышке по х
 //		float y = Gdx.graphics.getHeight() - Gdx.input.getY() - coinImg.getHeight()/2; //привязка к мышке по у
 
@@ -96,11 +127,11 @@ public class MyGdxGame extends ApplicationAdapter {
 
 
 		batch.begin();
-		//batch.setProjectionMatrix(camera.combined);
+		batch.setProjectionMatrix(camera.combined);
 		batch.draw(img, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch.draw(coinImg, x, y,
-				coinImg.getWidth()/2,
-				coinImg.getHeight()/2,
+				body.getPosition().x,
+				body.getPosition().y,
 				coinImg.getWidth(),
 				coinImg.getHeight(),
 				0.03f, 0.03f, 0, 0, 0,

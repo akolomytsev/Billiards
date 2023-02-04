@@ -11,7 +11,7 @@ public class PhysicsX {
     private final Box2DDebugRenderer debugRenderer;
 
     public PhysicsX(){
-        world = new World(new Vector2(0, 10), true);// направление гравитации, в данном случае никуда. И true означает что если тело не трогать, то оно ляжет спать (не будет участвовать в расчетах)
+        world = new World(new Vector2(0, 0), true);// направление гравитации, в данном случае никуда. И true означает что если тело не трогать, то оно ляжет спать (не будет участвовать в расчетах)
         debugRenderer = new Box2DDebugRenderer();
     }
 
